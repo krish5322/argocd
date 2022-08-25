@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'node-slave'
+        label 'kube-slave'
     }
     stages {
         stage('Build') {
