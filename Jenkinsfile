@@ -1,5 +1,7 @@
 pipeline{
-    agent any
+    agent {
+        label 'build-node'
+    }
     stages{
         stage("sonar quality check"){
             agent {
