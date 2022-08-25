@@ -8,6 +8,9 @@ pipeline {
                 label 'kube-slave'
             }
             steps {
+                sh 'sudo apt install git'
+            }
+            steps {
                  script{
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
                             sh 'chmod +x gradlew'
