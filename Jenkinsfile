@@ -50,6 +50,33 @@ pipeline {
                 }
             }
         }
+        stage("pushing the helm charts to nexus"){
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'docker_pass', variable: 'docker_password')]) {
+                          dir('kubernetes/') {
+                             sh '''
+                                 helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
+                                 tar -czvf  myapp-${helmversion}.tgz myapp/
+                                 aws ecr get-login-password --region us-west-2 | helm registry login | --username AWS | --password-stdin 487936429785.dkr.ecr.region.amazonaws.com
+                                 helm push myapp-${helmversion}.tgz oci://487936429785.dkr.ecr.region.amazonaws.com/
+                            '''
+                          }
+                    }
+                }
+            }
+        }
+        stage('Deploying application on k8s cluster') {
+            steps {
+               script{
+                   withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        dir('kubernetes/') {
+                          sh 'helm upgrade --install --set image.repository="487936429785.dkr.ecr.region.amazonaws.com/myapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
+                        }
+                    }
+               }
+            }
+        }
     }
     post {
 		always {
