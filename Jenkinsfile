@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment{
+        VERSION = "${env.BUILD_ID}"
+    }
     stages{
         stage("sonar quality check"){
             agent {
@@ -31,10 +34,10 @@ pipeline {
                     script{
                         withCredentials([string(credentialsId: 'docker_secret', variable: 'docker_secret')]) {
                              sh '''
-                             docker build -t bill3213/springapp:$BUILD_NUMBER .
+                             docker build -t bill3213/springapp:${VERSION} .
                              docker login -u bill3213 -p $docker_secret
-                             docker push bill3213/springapp:$BUILD_NUMBER
-                             docker rmi bill3213/springapp:$BUILD_NUMBER
+                             docker push bill3213/springapp:${VERSION}
+                             docker rmi bill3213/springapp:${VERSION}
                              '''
                         }
                     }
@@ -57,7 +60,7 @@ pipeline {
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
                                  aws ecr get-login-password --region ap-south-1 | helm registry login --username AWS --password-stdin 487936429785.dkr.ecr.ap-south-1.amazonaws.com
-                                 helm chart push 487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp:${helmversion}
+                                 helm push 487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp:${helmversion}
                              '''
                 }
             }
@@ -67,7 +70,7 @@ pipeline {
                script{
                    withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         dir('kubernetes/') {
-                          sh 'helm upgrade --install --set image.repository="487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp" --set image.tag="${helmversion}" myjavaapp myapp/ '
+                          sh 'helm upgrade --install --set image.repository="487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
                         }
                     }
                }
