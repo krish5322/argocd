@@ -1,9 +1,10 @@
 pipeline {
-    agent {
-        label 'azure'
-    }
+    agent any
     stages{
         stage("sonar quality check"){
+            agent {
+                label 'node-slave'
+            }
             steps{
                 script{
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
@@ -23,6 +24,9 @@ pipeline {
         }
 
         stage("docker build & docker push"){
+            agent {
+                label 'azure'
+            }
                 steps{
                     script{
                         withCredentials([string(credentialsId: 'docker_secret', variable: 'docker_secret')]) {
