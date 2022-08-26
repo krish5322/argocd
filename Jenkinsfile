@@ -21,7 +21,7 @@ pipeline {
                 }
             }
         }
-    stages{
+
         stage("docker build & docker push"){
                 steps{
                     script{
@@ -32,9 +32,9 @@ pipeline {
                              docker push bill3213/springapp:$BUILD_NUMBER
                              docker rmi bill3213/springapp:$BUILD_NUMBER
                              '''
+                        }
                     }
                 }
-
         }
     }
 }
