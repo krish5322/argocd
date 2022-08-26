@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'azure'
+        label 'kube-slave'
     }
     stages{
         stage("sonar quality check"){
