@@ -1,9 +1,12 @@
 pipeline {
     agent {
-        label 'kube-slave'
+        label 'node-slave'
     }
     stages {
         stage('Build') {
+            agent {
+                label 'kube-slave'
+            }
             steps {
                  script{
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
