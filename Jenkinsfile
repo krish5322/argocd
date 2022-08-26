@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage("docker build & docker push"){
             agent {
-                label 'node-slave'
+                label 'azure'
             }
             steps{
                 script{
