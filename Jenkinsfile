@@ -25,6 +25,9 @@ pipeline {
             }
         }
         stage("docker build & docker push"){
+            agent {
+                label 'node-slave'
+            }
             steps{
                 script{
                     withCredentials([string(credentialsId: 'docker_secret', variable: 'docker_secret')]) {
