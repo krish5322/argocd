@@ -60,7 +60,7 @@ pipeline {
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
                                  aws ecr get-login-password --region ap-south-1 | helm registry login --username AWS --password-stdin 487936429785.dkr.ecr.ap-south-1.amazonaws.com
-                                 helm push myapp-${helmversion}.tgz oci://487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp
+                                 aws ecr get-login-password --region ap-south-1 | helm push myapp-${helmversion}.tgz oci://487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp --username AWS --password-stdin
                              '''
                 }
             }
