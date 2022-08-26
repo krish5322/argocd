@@ -3,7 +3,7 @@ pipeline {
     stages{
         stage("sonar quality check"){
             agent {
-                label 'node-slave'
+                label 'kube-slave'
             }
             steps{
                 script{
