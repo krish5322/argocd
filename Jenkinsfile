@@ -57,7 +57,7 @@ pipeline {
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
                                  aws ecr get-login-password --region ap-south-1 | helm registry login --username AWS --password-stdin 487936429785.dkr.ecr.ap-south-1.amazonaws.com
-                                 helm chart push 487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp:myapp-${helmversion}
+                                 helm chart push 487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp:${helmversion}
                              '''
                 }
             }
@@ -67,7 +67,7 @@ pipeline {
                script{
                    withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         dir('kubernetes/') {
-                          sh 'helm upgrade --install --set image.repository="487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
+                          sh 'helm upgrade --install --set image.repository="487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp" --set image.tag="${helmversion}" myjavaapp myapp/ '
                         }
                     }
                }
