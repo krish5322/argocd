@@ -1,23 +1,18 @@
 pipeline {
     agent any
-    environment {
-    DOCKERHUB_CREDENTIALS = credentials('docker-token')
-    }
-    stages {
-        stage("docker build & docker push"){
-            agent {
-                label 'azure'
-            }
+    stage("docker build & docker push"){
             steps{
-                sh '''
-                   docker build -t bill3213/springapp:1 .
-                   sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                   docker push  bill3213/springapp:1
-                   docker rmi bill3213/springapp:1
-                '''
-
+                script{
+                    withCredentials([string(credentialsId: 'docker_secret', variable: 'docker_secret')]) {
+                             sh '''
+                             docker build -t bill3213/springapp:1 .
+                             docker login -u bill3213 -p $docker_secret
+                             docker push bill3213/springapp:1
+                             docker rmi bill3213/springapp:1
+                             '''
+                    }
+                }
             }
-        }
-    }
 
+    }
 }
