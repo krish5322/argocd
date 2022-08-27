@@ -55,13 +55,12 @@ pipeline {
         }
         stage("pushing the helm charts to ECR"){
             steps{
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'nexus_repo')]) {
+                withCredentials([string(credentialsId: 'helm-repo', variable: 'nexus_repo')]) {
                       dir('kubernetes/') {
                              sh '''
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
-                                 // curl -v -F file=@chart.tgz -u <username>:<password> http://20.39.224.51:8081/service/rest/v1/components?repository==helm-repo
-                                 curl -u admin:$nexus_repo http://20.39.224.51:8081/service/rest/v1/components?repository==helm-repo --upload-file myapp-${helmversion}.tgz -v
+                                 curl -u admin:$nexus_repo http://20.39.224.51:8081/repository/helm-repo/ --upload-file myapp-${helmversion}.tgz -v
                              '''
                       }
                 }
