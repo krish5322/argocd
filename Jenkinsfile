@@ -55,12 +55,13 @@ pipeline {
         }
         stage("pushing the helm charts to ECR"){
             steps{
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'nexus_repo')]) {
+                }
                 dir('kubernetes/') {
                              sh '''
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
-                                 aws ecr get-login-password --region ap-south-1 | helm registry login --username AWS --password-stdin 487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp
-                                 helm push myapp-${helmversion}.tgz oci://487936429785.dkr.ecr.ap-south-1.amazonaws.com/myapp
+                                 curl -u admin:$nexus_repo http://http://20.39.224.51:8081/repository/helm-repo/ --upload-file myapp-${helmversion}.tgz -v
                              '''
                 }
             }
