@@ -56,25 +56,21 @@ pipeline {
         stage("pushing the helm charts to ECR"){
             steps{
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'nexus_repo')]) {
-                }
-                dir('kubernetes/') {
+                      dir('kubernetes/') {
                              sh '''
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
                                  tar -czvf  myapp-${helmversion}.tgz myapp/
                                  curl -u admin:$nexus_repo http://20.39.224.51:8081/repository/helm-repo/ --upload-file myapp-${helmversion}.tgz -v
                              '''
+                      }
                 }
             }
         }
         stage('Deploying application on k8s cluster') {
             steps {
-               script{
-                   withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                        dir('kubernetes/') {
-                          sh 'helm upgrade --install --set image.repository="bill3213/springapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
-                        }
-                    }
-               }
+                dir('kubernetes/') {
+                    sh 'helm upgrade --install --set image.repository="bill3213/springapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
+                }
             }
         }
     }
