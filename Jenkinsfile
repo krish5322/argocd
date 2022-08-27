@@ -53,9 +53,9 @@ pipeline {
                 }
             }
         }
-        stage("pushing the helm charts to ECR"){
+        stage("pushing the helm charts to NEXUS"){
             steps{
-                withCredentials([string(credentialsId: 'helm-repo', variable: 'nexus_repo')]) {
+                withCredentials([string(credentialsId: 'helm_repo', variable: 'nexus_repo')]) {
                       dir('kubernetes/') {
                              sh '''
                                  helmversion=$( helm show chart myapp | grep version | cut -d: -f 2 | tr -d ' ')
