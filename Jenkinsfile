@@ -4,7 +4,7 @@ pipeline {
         VERSION = "${env.BUILD_ID}"
     }
     stages{
-        stage("sonar quality check"){
+        stage("sonar Quality check"){
             agent {
                 label 'kube-slave'
             }
