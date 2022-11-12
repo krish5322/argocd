@@ -5,9 +5,6 @@ pipeline {
     }
     stages{
         stage("sonar Quality check"){
-            agent {
-                label 'kube-slave'
-            }
             steps{
                 script{
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
